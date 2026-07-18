@@ -11,8 +11,10 @@ public class Player_IdleState : EntityState
     {
         base.Update();
 
-        if(Input.GetKeyDown(KeyCode.W))
+        if(playerScript.moveInput.x != 0)
+        {
             stateMachine.ChangeState(playerScript.moveState);
+        }
 
     }
 }
