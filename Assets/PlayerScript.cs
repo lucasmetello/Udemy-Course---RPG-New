@@ -2,21 +2,39 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-   private PlayerInputSet input;
+
+   public Animator anim {get; private set;}
+   public Rigidbody2D rb {get; private set;}
+   public PlayerInputSet input {get; private set;}
    private StateMachine stateMachine;
 
    public Player_IdleState idleState{get; private set;}
    public Player_MoveState moveState{get; private set;}
+   public Player_JumpState jumpState{get; private set;}
+   public Player_FallState fallState{get; private set;}
 
-   public Vector2 moveInput {get; private set;}
+  
+   
+
+   [Header("Movement Variables")]
+   public float moveSpeed;
+   public float jumpForce;
+   private bool facingRight = true;
+
+    public Vector2 moveInput {get; private set;}
 
    private void Awake()
    {
+    anim = GetComponentInChildren<Animator>();
+    rb = GetComponent<Rigidbody2D>();
+
     stateMachine = new StateMachine();
     input = new PlayerInputSet();
 
-    idleState = new Player_IdleState(this, stateMachine," Idle" );
-    moveState = new Player_MoveState(this, stateMachine, "Moving");
+    idleState = new Player_IdleState(this, stateMachine,"idle" );
+    moveState = new Player_MoveState(this, stateMachine, "move");
+    jumpState = new Player_JumpState(this, stateMachine, "jumpfall");
+    fallState = new Player_FallState(this, stateMachine, "jumpfall");
 
    }
 
@@ -26,6 +44,8 @@ public class PlayerScript : MonoBehaviour
 
       input.Player.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
       input.Player.Movement.canceled += context => moveInput = Vector2.zero;
+
+      
    }
 
    private void OnDisable()
@@ -41,5 +61,29 @@ public class PlayerScript : MonoBehaviour
    private void Update()
    {
     stateMachine.UpdateActiveState();
+    
    }
+
+   public void SetVelocity(float xVelocity, float yVelocity)
+   {
+    rb.linearVelocity = new Vector2(xVelocity, yVelocity);
+    HandleFlip(xVelocity);
+   }
+
+   public void HandleFlip(float xVelocity)
+   {
+    if(xVelocity > 0 && facingRight == false || xVelocity < 0 && facingRight)
+    {
+        Flip();
+    }
+   }
+
+   public void Flip()
+   {
+    transform.Rotate(0, 180, 0);
+    facingRight = !facingRight;
+
+   }
+
+   
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Player_MoveState : EntityState 
+public class Player_MoveState : Player_GroundedState
 {
   public Player_MoveState(PlayerScript playerScript, StateMachine stateMachine, string stateName) : base(playerScript, stateMachine, stateName)
   {
@@ -15,5 +15,7 @@ public class Player_MoveState : EntityState
     {
         stateMachine.ChangeState(playerScript.idleState);
     }
+    playerScript.SetVelocity(playerScript.moveInput.x * playerScript.moveSpeed, rb.linearVelocity.y);
+
   }
 }
